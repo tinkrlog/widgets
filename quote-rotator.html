@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: transparent;
+    font-family: 'SFMono-Regular', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    color: #e8e6e3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .widget {
+    padding: 20px 28px;
+    max-width: 600px;
+    width: 100%;
+  }
+  .quote-mark {
+    font-size: 28px;
+    color: #f5c542;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .quote-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #ccc;
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+  .quote-author {
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .quote-author .dash {
+    color: #f5c542;
+    margin-right: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="quote-mark">⚡</div>
+  <div class="quote-text" id="quote"></div>
+  <div class="quote-author" id="author"></div>
+</div>
+<script>
+  const quotes = [
+    ["Ship it before it's ready. You'll learn more from users than from your IDE.", "Pieter Levels"],
+    ["The best time to launch is when you're embarrassed by v1.", "Reid Hoffman"],
+    ["Ideas are cheap. Execution is everything.", "Chris Sacca"],
+    ["Make something people want.", "Paul Graham"],
+    ["Your side project doesn't need a business plan. It needs a first user.", "Daniel Vassallo"],
+    ["Don't scale. Do things that don't scale first.", "Paul Graham"],
+    ["Revenue is the ultimate validation.", "Jason Fried"],
+    ["Build the simplest thing that could possibly work.", "Ward Cunningham"],
+    ["Charge more. Seriously.", "Patrick McKenzie"],
+    ["The goal isn't to build a product. The goal is to solve a problem.", "Sahil Lavingia"],
+    ["Talk to your users. Then talk to them again.", "Jessica Livingston"],
+    ["Overnight success takes years.", "Naval Ravikant"],
+    ["Start small, stay small, or grow — the choice should be deliberate.", "Rob Walling"],
+    ["Every expert was once a beginner. Every pro was once an amateur.", "Jeff Goins"],
+    ["If you're not embarrassed by the first version, you've launched too late.", "Matt Mullenweg"],
+    ["Perfect is the enemy of shipped.", "Voltaire, probably"],
+    ["Build in public. The vulnerability is the marketing.", "KP"],
+    ["Distribution is more important than product.", "Justin Kan"],
+    ["The indie hacker advantage: you can move fast and stay weird.", "Arvid Kahl"],
+    ["Your unfair advantage is that you care more than a big company ever will.", "DHH"],
+    ["Constraints breed creativity. A small budget is a feature, not a bug.", "Jason Fried"],
+    ["Don't ask people if they'd use your product. Ask them to pay for it.", "Rob Fitzpatrick"],
+    ["Momentum is everything. Ship weekly.", "Levels.io"],
+    ["A side project with one paying user is more real than a startup with a pitch deck.", "Anonymous"],
+    ["Reduce scope, not quality.", "Basecamp"],
+    ["Focus is saying no to the hundred other good ideas.", "Steve Jobs"],
+    ["The market doesn't care about your tech stack.", "DHH"],
+    ["Small teams build big things when they stop asking for permission.", "Naval Ravikant"],
+    ["Revenue before funding. Customers before investors.", "Indie Hackers"],
+    ["You're one project away from a completely different life.", "Ryan Kulp"]
+  ];
+
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  const idx = dayOfYear % quotes.length;
+
+  document.getElementById('quote').textContent = quotes[idx][0];
+  document.getElementById('author').innerHTML = '<span class="dash">—</span>' + quotes[idx][1];
+</script>
+</body>
+</html>

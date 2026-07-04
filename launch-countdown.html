@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: transparent;
+    font-family: 'SFMono-Regular', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    color: #e8e6e3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .widget {
+    padding: 20px 28px;
+    text-align: center;
+    width: 100%;
+    max-width: 480px;
+  }
+  .header {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #f5c542;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .countdown {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .unit {
+    text-align: center;
+  }
+  .unit-value {
+    font-size: 40px;
+    font-weight: 700;
+    color: #e8e6e3;
+    line-height: 1;
+    min-width: 56px;
+  }
+  .unit-label {
+    font-size: 9px;
+    color: #555;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+  .sep {
+    font-size: 32px;
+    color: #333;
+    line-height: 1;
+    align-self: flex-start;
+  }
+  .launched {
+    display: none;
+    font-size: 18px;
+    font-weight: 700;
+    color: #4ade80;
+    letter-spacing: 1px;
+  }
+  .launched .rocket { font-size: 24px; }
+  .target-date {
+    font-size: 10px;
+    color: #444;
+    letter-spacing: 1px;
+  }
+  /* Config panel */
+  .config {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #1e1e1e;
+  }
+  .config-label {
+    font-size: 10px;
+    color: #555;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .config input {
+    font-family: inherit;
+    font-size: 13px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #e8e6e3;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-align: center;
+    width: 160px;
+    outline: none;
+  }
+  .config input:focus { border-color: #f5c542; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="header">⚡ launch in</div>
+  <div class="countdown" id="countdown">
+    <div class="unit"><div class="unit-value" id="days">00</div><div class="unit-label">days</div></div>
+    <div class="sep">:</div>
+    <div class="unit"><div class="unit-value" id="hours">00</div><div class="unit-label">hours</div></div>
+    <div class="sep">:</div>
+    <div class="unit"><div class="unit-value" id="mins">00</div><div class="unit-label">mins</div></div>
+    <div class="sep">:</div>
+    <div class="unit"><div class="unit-value" id="secs">00</div><div class="unit-label">secs</div></div>
+  </div>
+  <div class="launched" id="launched">
+    <span class="rocket">🚀</span> SHIPPED!
+  </div>
+  <div class="target-date" id="targetLabel"></div>
+  <div class="config">
+    <div class="config-label">Target date</div>
+    <input type="date" id="dateInput">
+  </div>
+</div>
+<script>
+  const STORAGE_KEY = 'tinkrlog_launch_date';
+  const daysEl = document.getElementById('days');
+  const hoursEl = document.getElementById('hours');
+  const minsEl = document.getElementById('mins');
+  const secsEl = document.getElementById('secs');
+  const countdownEl = document.getElementById('countdown');
+  const launchedEl = document.getElementById('launched');
+  const targetLabel = document.getElementById('targetLabel');
+  const dateInput = document.getElementById('dateInput');
+
+  function pad(n) { return n.toString().padStart(2, '0'); }
+
+  function getTarget() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) return new Date(stored);
+    } catch(e) {}
+    // Default: 14 days from now
+    const d = new Date();
+    d.setDate(d.getDate() + 14);
+    d.setHours(9, 0, 0, 0);
+    return d;
+  }
+
+  let target = getTarget();
+  dateInput.value = target.toISOString().slice(0, 10);
+
+  dateInput.addEventListener('change', (e) => {
+    target = new Date(e.target.value + 'T09:00:00');
+    try { localStorage.setItem(STORAGE_KEY, target.toISOString()); } catch(e) {}
+    tick();
+  });
+
+  function formatDate(d) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function tick() {
+    const now = Date.now();
+    const diff = target.getTime() - now;
+
+    targetLabel.textContent = 'Target: ' + formatDate(target);
+
+    if (diff <= 0) {
+      countdownEl.style.display = 'none';
+      launchedEl.style.display = 'block';
+      return;
+    }
+
+    countdownEl.style.display = 'flex';
+    launchedEl.style.display = 'none';
+
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    daysEl.textContent = pad(d);
+    hoursEl.textContent = pad(h);
+    minsEl.textContent = pad(m);
+    secsEl.textContent = pad(s);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>

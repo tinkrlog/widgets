@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: transparent;
+    font-family: 'SFMono-Regular', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    color: #e8e6e3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .widget {
+    padding: 20px 28px;
+    width: 100%;
+    max-width: 380px;
+  }
+  .header {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 16px;
+  }
+  .ring-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 16px;
+  }
+  .ring-container svg {
+    transform: rotate(-90deg);
+    width: 140px;
+    height: 140px;
+  }
+  .ring-bg {
+    fill: none;
+    stroke: #1e1e1e;
+    stroke-width: 10;
+  }
+  .ring-fill {
+    fill: none;
+    stroke: #f5c542;
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease;
+  }
+  .ring-fill.exceeded { stroke: #4ade80; }
+  .ring-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .ring-pct {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e8e6e3;
+  }
+  .ring-pct .pct-sign { font-size: 14px; color: #666; font-weight: 400; }
+  .ring-label {
+    font-size: 9px;
+    color: #555;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .inputs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+  .input-group {
+    text-align: center;
+  }
+  .input-group label {
+    display: block;
+    font-size: 9px;
+    color: #555;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .input-group input {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #e8e6e3;
+    padding: 6px 10px;
+    border-radius: 4px;
+    text-align: center;
+    width: 110px;
+    outline: none;
+  }
+  .input-group input:focus { border-color: #f5c542; }
+  .input-group .currency {
+    color: #555;
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="header">⚡ mrr goal</div>
+  <div class="ring-container">
+    <svg viewBox="0 0 140 140">
+      <circle class="ring-bg" cx="70" cy="70" r="58"/>
+      <circle class="ring-fill" id="ringFill" cx="70" cy="70" r="58"/>
+    </svg>
+    <div class="ring-center">
+      <div class="ring-pct" id="ringPct">0<span class="pct-sign">%</span></div>
+      <div class="ring-label" id="ringLabel">of goal</div>
+    </div>
+  </div>
+  <div class="inputs">
+    <div class="input-group">
+      <label>Current €</label>
+      <input type="number" id="current" value="0" min="0" step="1">
+    </div>
+    <div class="input-group">
+      <label>Goal €</label>
+      <input type="number" id="goal" value="500" min="1" step="1">
+    </div>
+  </div>
+</div>
+<script>
+  const STORAGE_KEY = 'tinkrlog_rev_goal';
+  const ringFill = document.getElementById('ringFill');
+  const ringPct = document.getElementById('ringPct');
+  const ringLabel = document.getElementById('ringLabel');
+  const currentInput = document.getElementById('current');
+  const goalInput = document.getElementById('goal');
+
+  const circumference = 2 * Math.PI * 58;
+  ringFill.style.strokeDasharray = circumference;
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return { current: 0, goal: 500 };
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        current: parseFloat(currentInput.value) || 0,
+        goal: parseFloat(goalInput.value) || 500
+      }));
+    } catch(e) {}
+  }
+
+  function render() {
+    const cur = parseFloat(currentInput.value) || 0;
+    const goal = parseFloat(goalInput.value) || 500;
+    const pct = Math.min((cur / goal) * 100, 100);
+    const exceeded = cur >= goal;
+
+    const offset = circumference - (pct / 100) * circumference;
+    ringFill.style.strokeDashoffset = offset;
+    ringFill.classList.toggle('exceeded', exceeded);
+
+    ringPct.innerHTML = Math.round(pct) + '<span class="pct-sign">%</span>';
+    ringLabel.textContent = exceeded ? 'goal reached 🚀' : '€' + cur + ' / €' + goal;
+  }
+
+  const state = loadState();
+  currentInput.value = state.current;
+  goalInput.value = state.goal;
+
+  currentInput.addEventListener('input', () => { saveState(); render(); });
+  goalInput.addEventListener('input', () => { saveState(); render(); });
+
+  render();
+</script>
+</body>
+</html>

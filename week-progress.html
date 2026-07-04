@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: transparent;
+    font-family: 'SFMono-Regular', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    color: #e8e6e3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .widget {
+    padding: 20px 28px;
+    width: 100%;
+    max-width: 440px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+  }
+  .label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #888;
+  }
+  .pct {
+    font-size: 13px;
+    color: #f5c542;
+    font-weight: 600;
+  }
+  .days {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .day {
+    flex: 1;
+    text-align: center;
+  }
+  .day-label {
+    font-size: 10px;
+    color: #555;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .day-bar {
+    height: 32px;
+    border-radius: 4px;
+    background: #1e1e1e;
+    position: relative;
+    overflow: hidden;
+  }
+  .day-bar.past {
+    background: #2a2518;
+  }
+  .day-bar.past::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 100%;
+    background: #f5c542;
+    opacity: 0.25;
+    border-radius: 4px;
+  }
+  .day-bar.today {
+    background: #f5c542;
+    box-shadow: 0 0 12px rgba(245, 197, 66, 0.3);
+  }
+  .day-bar.future {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+  }
+  .day-label.today {
+    color: #f5c542;
+    font-weight: 700;
+  }
+  .bar-track {
+    height: 3px;
+    background: #1a1a1a;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f5c542, #e8a820);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="header">
+    <span class="label">⚡ this week</span>
+    <span class="pct" id="pct"></span>
+  </div>
+  <div class="days" id="days"></div>
+  <div class="bar-track"><div class="bar-fill" id="fill"></div></div>
+</div>
+<script>
+  const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const now = new Date();
+  // JS getDay: 0=Sun. Convert to Mon=0
+  let jsDay = now.getDay();
+  let dayIdx = jsDay === 0 ? 6 : jsDay - 1;
+
+  const container = document.getElementById('days');
+  labels.forEach((lbl, i) => {
+    const dayEl = document.createElement('div');
+    dayEl.className = 'day';
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'day-label' + (i === dayIdx ? ' today' : '');
+    labelEl.textContent = lbl;
+
+    const barEl = document.createElement('div');
+    if (i < dayIdx) barEl.className = 'day-bar past';
+    else if (i === dayIdx) barEl.className = 'day-bar today';
+    else barEl.className = 'day-bar future';
+
+    dayEl.appendChild(labelEl);
+    dayEl.appendChild(barEl);
+    container.appendChild(dayEl);
+  });
+
+  const h = now.getHours();
+  const progress = ((dayIdx * 24 + h) / (7 * 24) * 100);
+  document.getElementById('pct').textContent = Math.round(progress) + '%';
+  document.getElementById('fill').style.width = progress + '%';
+</script>
+</body>
+</html>

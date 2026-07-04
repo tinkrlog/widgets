@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: transparent;
+    font-family: 'SFMono-Regular', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    color: #e8e6e3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .widget {
+    padding: 20px 28px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #888;
+  }
+  .streak-count {
+    font-size: 13px;
+    color: #f5c542;
+    font-weight: 600;
+  }
+  .streak-count .fire { margin-right: 2px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .cell.empty { background: #1a1a1a; border: 1px solid #222; }
+  .cell.empty:hover { border-color: #444; }
+  .cell.active {
+    background: #f5c542;
+    border: 1px solid #f5c542;
+  }
+  .cell.active.today {
+    box-shadow: 0 0 8px rgba(245, 197, 66, 0.4);
+  }
+  .cell.today::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #f5c542;
+  }
+  .cell.future { background: #111; border: 1px solid #1a1a1a; cursor: default; }
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #444;
+    letter-spacing: 1px;
+  }
+  .footer .reset-btn {
+    color: #444;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  .footer .reset-btn:hover { color: #888; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="header">
+    <span class="title">⚡ ship streak</span>
+    <span class="streak-count" id="streakCount"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="footer">
+    <span id="monthLabel"></span>
+    <button class="reset-btn" id="resetBtn">reset</button>
+  </div>
+</div>
+<script>
+  const STORAGE_KEY = 'tinkrlog_streak';
+  const grid = document.getElementById('grid');
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  // First day of month (Mon=0)
+  let firstDay = new Date(year, month, 1).getDay();
+  firstDay = firstDay === 0 ? 6 : firstDay - 1;
+
+  const months = ['January','February','March','April','May','June',
+    'July','August','September','October','November','December'];
+  document.getElementById('monthLabel').textContent = months[month] + ' ' + year;
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data.month === month && data.year === year) return data.days;
+      }
+    } catch(e) {}
+    return [];
+  }
+
+  function saveState(days) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ year, month, days }));
+    } catch(e) {}
+  }
+
+  let activeDays = loadState();
+
+  function calcStreak() {
+    let streak = 0;
+    for (let d = today; d >= 1; d--) {
+      if (activeDays.includes(d)) streak++;
+      else break;
+    }
+    return streak;
+  }
+
+  function render() {
+    grid.innerHTML = '';
+
+    // Padding cells for alignment
+    for (let i = 0; i < firstDay; i++) {
+      const pad = document.createElement('div');
+      pad.className = 'cell future';
+      pad.style.visibility = 'hidden';
+      grid.appendChild(pad);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cell = document.createElement('div');
+      const isActive = activeDays.includes(d);
+      const isFuture = d > today;
+      const isToday = d === today;
+
+      if (isFuture) {
+        cell.className = 'cell future';
+      } else if (isActive) {
+        cell.className = 'cell active' + (isToday ? ' today' : '');
+      } else {
+        cell.className = 'cell empty' + (isToday ? ' today' : '');
+      }
+
+      if (!isFuture) {
+        cell.addEventListener('click', () => {
+          if (activeDays.includes(d)) {
+            activeDays = activeDays.filter(x => x !== d);
+          } else {
+            activeDays.push(d);
+          }
+          saveState(activeDays);
+          render();
+        });
+      }
+
+      grid.appendChild(cell);
+    }
+
+    const streak = calcStreak();
+    document.getElementById('streakCount').innerHTML =
+      streak > 0 ? '<span class="fire">🔥</span>' + streak + 'd' : '0d — ship something!';
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    activeDays = [];
+    saveState(activeDays);
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>

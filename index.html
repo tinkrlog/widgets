@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tinkrlog — widgets</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d0d0d;
+    font-family: 'SFMono-Regular', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
+    color: #e8e6e3;
+    padding: 40px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  h1 .bolt { color: #f5c542; }
+  .subtitle {
+    font-size: 12px;
+    color: #666;
+    letter-spacing: 1px;
+    margin-bottom: 40px;
+  }
+  .widget-card {
+    margin-bottom: 40px;
+    border: 1px solid #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #111;
+    border-bottom: 1px solid #1e1e1e;
+  }
+  .widget-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ccc;
+  }
+  .widget-file {
+    font-size: 10px;
+    color: #555;
+    letter-spacing: 1px;
+  }
+  .widget-preview {
+    background: #191919;
+  }
+  .widget-preview iframe {
+    width: 100%;
+    border: none;
+    display: block;
+  }
+  .widget-desc {
+    padding: 12px 16px;
+    font-size: 11px;
+    color: #666;
+    line-height: 1.6;
+    background: #111;
+    border-top: 1px solid #1e1e1e;
+  }
+  .widget-desc code {
+    background: #1a1a1a;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #f5c542;
+    font-size: 10px;
+  }
+  .how-to {
+    margin-top: 40px;
+    padding: 20px;
+    border: 1px solid #1e1e1e;
+    border-radius: 8px;
+    background: #111;
+  }
+  .how-to h2 {
+    font-size: 14px;
+    color: #f5c542;
+    margin-bottom: 12px;
+  }
+  .how-to p {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.8;
+  }
+  .how-to code {
+    background: #1a1a1a;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #f5c542;
+  }
+</style>
+</head>
+<body>
+  <h1><span class="bolt">⚡</span> tinkrlog widgets</h1>
+  <p class="subtitle">Self-hosted Notion embeds — no accounts, no subscriptions, no branding</p>
+
+  <div class="widget-card">
+    <div class="widget-header">
+      <span class="widget-name">Greeting + Clock</span>
+      <span class="widget-file">greeting-clock.html</span>
+    </div>
+    <div class="widget-preview">
+      <iframe src="greeting-clock.html" height="120"></iframe>
+    </div>
+    <div class="widget-desc">Time-based greeting with live clock. Adapts to morning/afternoon/evening/night. Suggested embed size: full width × 120px.</div>
+  </div>
+
+  <div class="widget-card">
+    <div class="widget-header">
+      <span class="widget-name">Quote Rotator</span>
+      <span class="widget-file">quote-rotator.html</span>
+    </div>
+    <div class="widget-preview">
+      <iframe src="quote-rotator.html" height="110"></iframe>
+    </div>
+    <div class="widget-desc">30 curated indie hacker quotes. Rotates daily based on day-of-year. Edit the <code>quotes</code> array to customize. Suggested embed size: full width × 110px.</div>
+  </div>
+
+  <div class="widget-card">
+    <div class="widget-header">
+      <span class="widget-name">Week Progress</span>
+      <span class="widget-file">week-progress.html</span>
+    </div>
+    <div class="widget-preview">
+      <iframe src="week-progress.html" height="110"></iframe>
+    </div>
+    <div class="widget-desc">Visual Mon–Sun progress with current day highlighted and percentage bar. Suggested embed size: half width × 110px.</div>
+  </div>
+
+  <div class="widget-card">
+    <div class="widget-header">
+      <span class="widget-name">Year Progress</span>
+      <span class="widget-file">year-progress.html</span>
+    </div>
+    <div class="widget-preview">
+      <iframe src="year-progress.html" height="100"></iframe>
+    </div>
+    <div class="widget-desc">Year completion with day count and progress bar. Suggested embed size: half width × 100px.</div>
+  </div>
+
+  <div class="widget-card">
+    <div class="widget-header">
+      <span class="widget-name">Pomodoro Timer</span>
+      <span class="widget-file">pomodoro.html</span>
+    </div>
+    <div class="widget-preview">
+      <iframe src="pomodoro.html" height="220"></iframe>
+    </div>
+    <div class="widget-desc">Focus / Break / Long Break with session dots. Interactive, no backend. Suggested embed size: half width × 220px.</div>
+  </div>
+
+  <div class="widget-card">
+    <div class="widget-header">
+      <span class="widget-name">Launch Countdown</span>
+      <span class="widget-file">launch-countdown.html</span>
+    </div>
+    <div class="widget-preview">
+      <iframe src="launch-countdown.html" height="200"></iframe>
+    </div>
+    <div class="widget-desc">Configurable countdown to a target date. Uses <code>localStorage</code> to persist. Shows "🚀 SHIPPED!" when time's up. Suggested embed size: full width × 200px.</div>
+  </div>
+
+  <div class="widget-card">
+    <div class="widget-header">
+      <span class="widget-name">Ship Streak</span>
+      <span class="widget-file">streak-grid.html</span>
+    </div>
+    <div class="widget-preview">
+      <iframe src="streak-grid.html" height="180"></iframe>
+    </div>
+    <div class="widget-desc">Clickable 30-day dot grid. Click to mark days you shipped. Calculates current streak. Uses <code>localStorage</code>. Suggested embed size: half width × 180px.</div>
+  </div>
+
+  <div class="widget-card">
+    <div class="widget-header">
+      <span class="widget-name">MRR Goal</span>
+      <span class="widget-file">revenue-goal.html</span>
+    </div>
+    <div class="widget-preview">
+      <iframe src="revenue-goal.html" height="260"></iframe>
+    </div>
+    <div class="widget-desc">Ring progress toward a revenue target. Editable current/goal values. Turns green when exceeded. Uses <code>localStorage</code>. Suggested embed size: half width × 260px.</div>
+  </div>
+
+  <div class="how-to">
+    <h2>How to embed in Notion</h2>
+    <p>
+      1. Host this folder on GitHub Pages (or any static host).<br>
+      2. In Notion, type <code>/embed</code> and paste the widget URL, e.g. <code>https://yourusername.github.io/tinkrlog-widgets/greeting-clock.html</code><br>
+      3. Resize the embed block to the suggested dimensions.<br>
+      4. Done — works on free Notion plans, survives template duplication.
+    </p>
+  </div>
+</body>
+</html>

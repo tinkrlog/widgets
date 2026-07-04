@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: transparent;
+    font-family: 'SFMono-Regular', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    color: #e8e6e3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .widget {
+    text-align: center;
+    padding: 24px 32px;
+    width: 100%;
+  }
+  .greeting {
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #f5c542;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .time {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: #e8e6e3;
+    line-height: 1;
+  }
+  .time .seconds {
+    font-size: 20px;
+    color: #666;
+    font-weight: 400;
+    vertical-align: super;
+    margin-left: 2px;
+  }
+  .date-line {
+    font-size: 12px;
+    color: #666;
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+  .bolt {
+    color: #f5c542;
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="greeting" id="greeting"></div>
+  <div class="time" id="time"></div>
+  <div class="date-line" id="dateline"></div>
+</div>
+<script>
+  function getGreeting(h) {
+    if (h < 6) return '⚡ night owl mode';
+    if (h < 12) return '⚡ good morning, builder';
+    if (h < 17) return '⚡ good afternoon, builder';
+    if (h < 21) return '⚡ good evening, builder';
+    return '⚡ night owl mode';
+  }
+
+  function pad(n) { return n.toString().padStart(2, '0'); }
+
+  function tick() {
+    const now = new Date();
+    const h = now.getHours();
+    const m = now.getMinutes();
+    const s = now.getSeconds();
+    document.getElementById('greeting').textContent = getGreeting(h);
+    document.getElementById('time').innerHTML =
+      pad(h) + '<span class="bolt">:</span>' + pad(m) +
+      '<span class="seconds">' + pad(s) + '</span>';
+
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('dateline').textContent =
+      days[now.getDay()] + ' · ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>

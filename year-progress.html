@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: transparent;
+    font-family: 'SFMono-Regular', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    color: #e8e6e3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .widget {
+    padding: 20px 28px;
+    width: 100%;
+    max-width: 440px;
+  }
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .year {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e8e6e3;
+  }
+  .year .bolt {
+    color: #f5c542;
+  }
+  .pct-big {
+    font-size: 28px;
+    font-weight: 700;
+    color: #f5c542;
+  }
+  .pct-big .pct-sign {
+    font-size: 14px;
+    color: #888;
+    font-weight: 400;
+  }
+  .bar-container {
+    height: 8px;
+    background: #1a1a1a;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #e8a820, #f5c542);
+  }
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #555;
+    letter-spacing: 1px;
+  }
+  .bottom-row .highlight {
+    color: #888;
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="top-row">
+    <div class="year" id="year"></div>
+    <div class="pct-big" id="pct"></div>
+  </div>
+  <div class="bar-container"><div class="bar-fill" id="fill"></div></div>
+  <div class="bottom-row">
+    <span>Day <span class="highlight" id="daynum"></span> of <span class="highlight" id="total"></span></span>
+    <span><span class="highlight" id="remaining"></span> days left</span>
+  </div>
+</div>
+<script>
+  const now = new Date();
+  const yr = now.getFullYear();
+  const start = new Date(yr, 0, 1);
+  const end = new Date(yr + 1, 0, 1);
+  const totalDays = Math.ceil((end - start) / 86400000);
+  const dayNum = Math.ceil((now - start) / 86400000);
+  const pct = (dayNum / totalDays * 100);
+
+  document.getElementById('year').innerHTML = yr;
+  document.getElementById('pct').innerHTML = pct.toFixed(1) + '<span class="pct-sign">%</span>';
+  document.getElementById('fill').style.width = pct + '%';
+  document.getElementById('daynum').textContent = dayNum;
+  document.getElementById('total').textContent = totalDays;
+  document.getElementById('remaining').textContent = totalDays - dayNum;
+</script>
+</body>
+</html>
