@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="theme.css">
+<style>
+  body { display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+  .wrap { text-align: center; }
+  .label-top { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 6px; }
+  .count { font-size: 52px; font-weight: 700; letter-spacing: -3px; color: var(--text); }
+  .count .unit { font-size: 14px; letter-spacing: 1px; color: var(--text-ghost); font-weight: 400; margin-left: 4px; }
+  .weeks { display: flex; gap: 4px; justify-content: center; margin: 14px 0 12px; }
+  .wk { width: 18px; height: 18px; border-radius: 3px; }
+  .wk.hit { background: var(--amber-glow); border: 1px solid rgba(245,197,66,0.3); }
+  .wk.miss { background: var(--card-bg); border: 1px solid var(--border); }
+  .wk.current { background: var(--amber); box-shadow: 0 0 8px rgba(245,197,66,0.3); }
+  .btn-row { display: flex; gap: 8px; justify-content: center; }
+  .btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover { border-color: var(--amber); color: var(--amber); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="label-top">🔥 ship streak</div>
+  <div class="count" id="count">0<span class="unit">weeks</span></div>
+  <div class="weeks" id="weeks"></div>
+  <div class="btn-row">
+    <button class="btn" onclick="ship()">⚡ I shipped this week</button>
+    <button class="btn" onclick="resetStreak()">Reset</button>
+  </div>
+</div>
+<script>
+const KEY = 'tinkrlog-streak';
+function getState() {
+  try { return JSON.parse(localStorage.getItem(KEY)) || {weeks: [], streak: 0}; }
+  catch { return {weeks: [], streak: 0}; }
+}
+function setState(s) { localStorage.setItem(KEY, JSON.stringify(s)); }
+
+function weekId() {
+  const d = new Date(); const jan1 = new Date(d.getFullYear(),0,1);
+  return d.getFullYear() + '-W' + String(Math.ceil(((d - jan1) / 86400000 + jan1.getDay()) / 7)).padStart(2,'0');
+}
+
+function ship() {
+  const s = getState(); const w = weekId();
+  if (!s.weeks.includes(w)) { s.weeks.push(w); }
+  // recalc streak
+  let streak = 0; const now = new Date();
+  for (let i = 0; i < 52; i++) {
+    const d = new Date(now); d.setDate(d.getDate() - i * 7);
+    const y = d.getFullYear(); const jan1 = new Date(y,0,1);
+    const wk = y + '-W' + String(Math.ceil(((d - jan1) / 86400000 + jan1.getDay()) / 7)).padStart(2,'0');
+    if (s.weeks.includes(wk)) streak++; else break;
+  }
+  s.streak = streak;
+  setState(s); render();
+}
+
+function resetStreak() { localStorage.removeItem(KEY); render(); }
+
+function render() {
+  const s = getState();
+  document.getElementById('count').innerHTML = `${s.streak}<span class="unit">week${s.streak !== 1 ? 's' : ''}</span>`;
+  const el = document.getElementById('weeks');
+  el.innerHTML = '';
+  const w = weekId();
+  for (let i = 7; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i * 7);
+    const y = d.getFullYear(); const jan1 = new Date(y,0,1);
+    const wk = y + '-W' + String(Math.ceil(((d - jan1) / 86400000 + jan1.getDay()) / 7)).padStart(2,'0');
+    const div = document.createElement('div');
+    div.className = 'wk ' + (wk === w ? 'current' : s.weeks.includes(wk) ? 'hit' : 'miss');
+    el.appendChild(div);
+  }
+}
+render();
+</script>
+</body>
+</html>

@@ -3,217 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="theme.css">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #191919;
-    font-family: 'SFMono-Regular', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
-    color: #e8e6e3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    overflow: hidden;
-  }
-  .widget {
-    padding: 20px 28px;
-    text-align: center;
-    width: 100%;
-    max-width: 360px;
-  }
-  .mode-tabs {
-    display: flex;
-    gap: 4px;
-    justify-content: center;
-    margin-bottom: 18px;
-  }
-  .tab {
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 5px 12px;
-    border-radius: 3px;
-    cursor: pointer;
-    color: #666;
-    background: transparent;
-    border: 1px solid transparent;
-    font-family: inherit;
-    transition: all 0.2s;
-  }
-  .tab.active {
-    color: #f5c542;
-    border-color: #f5c54233;
-    background: #f5c54210;
-  }
-  .tab:hover:not(.active) { color: #999; }
-  .timer-display {
-    font-size: 64px;
-    font-weight: 700;
-    color: #e8e6e3;
-    letter-spacing: -2px;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-  .timer-display .colon { color: #f5c542; }
-  .timer-display.break-mode { color: #4ade80; }
-  .timer-display.break-mode .colon { color: #4ade80; }
-  .session-label {
-    font-size: 10px;
-    color: #555;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 18px;
-  }
-  .controls {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-  }
+  body { display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+  .wrap { text-align: center; }
+  .mode { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 8px; }
+  .timer { font-size: 56px; font-weight: 700; letter-spacing: -3px; color: var(--text); }
+  .timer .colon { color: var(--amber); }
+  .sessions { font-size: 9px; color: var(--text-ghost); letter-spacing: 1px; margin: 10px 0 16px; }
+  .sessions .done { color: var(--amber); }
+  .btns { display: flex; gap: 8px; justify-content: center; }
   .btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
     font-family: inherit;
-    font-size: 11px;
-    letter-spacing: 1.5px;
+    font-size: 10px;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    padding: 8px 20px;
+    padding: 6px 18px;
     border-radius: 4px;
     cursor: pointer;
-    border: none;
-    transition: all 0.15s;
+    transition: all 0.2s;
   }
-  .btn-primary {
-    background: #f5c542;
-    color: #1a1a1a;
-    font-weight: 600;
-  }
-  .btn-primary:hover { background: #e8b830; }
-  .btn-primary.running {
-    background: #333;
-    color: #ccc;
-  }
-  .btn-primary.running:hover { background: #444; }
-  .btn-ghost {
-    background: transparent;
-    color: #555;
-    border: 1px solid #333;
-  }
-  .btn-ghost:hover { color: #999; border-color: #555; }
-  .cycles {
-    margin-top: 14px;
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-  }
-  .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #2a2a2a;
-  }
-  .dot.done { background: #f5c542; }
-  .dot.break-done { background: #4ade80; }
+  .btn:hover { border-color: var(--amber); color: var(--amber); }
+  .btn.active { background: var(--amber); color: #0d0d0d; border-color: var(--amber); }
 </style>
 </head>
 <body>
-<div class="widget">
-  <div class="mode-tabs">
-    <button class="tab active" data-mins="25" data-mode="work">Focus</button>
-    <button class="tab" data-mins="5" data-mode="break">Break</button>
-    <button class="tab" data-mins="15" data-mode="long">Long break</button>
+<div class="wrap">
+  <div class="mode" id="mode">focus</div>
+  <div class="timer" id="timer">25<span class="colon">:</span>00</div>
+  <div class="sessions" id="sessions"></div>
+  <div class="btns">
+    <button class="btn" id="startBtn" onclick="toggle()">Start</button>
+    <button class="btn" id="resetBtn" onclick="reset()">Reset</button>
   </div>
-  <div class="timer-display" id="display">25<span class="colon">:</span>00</div>
-  <div class="session-label" id="label">ready to focus</div>
-  <div class="controls">
-    <button class="btn btn-primary" id="startBtn">Start</button>
-    <button class="btn btn-ghost" id="resetBtn">Reset</button>
-  </div>
-  <div class="cycles" id="cycles"></div>
 </div>
 <script>
-  let totalSecs, remaining, interval = null, running = false;
-  let currentMode = 'work';
-  let completed = 0;
+const FOCUS = 25 * 60, BREAK = 5 * 60;
+let seconds = FOCUS, running = false, interval = null, mode = 'focus', count = 0;
 
-  const display = document.getElementById('display');
-  const label = document.getElementById('label');
-  const startBtn = document.getElementById('startBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const cyclesEl = document.getElementById('cycles');
+function render() {
+  const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const s = String(seconds % 60).padStart(2, '0');
+  document.getElementById('timer').innerHTML = `${m}<span class="colon">:</span>${s}`;
+  document.getElementById('mode').textContent = mode;
+  const dots = Array.from({length: 4}, (_, i) => i < count ? '⚡' : '·').join(' ');
+  document.getElementById('sessions').innerHTML = dots;
+}
 
-  function setMode(mins, mode) {
-    clearInterval(interval); interval = null; running = false;
-    currentMode = mode;
-    totalSecs = mins * 60; remaining = totalSecs;
-    render();
-    startBtn.textContent = 'Start';
-    startBtn.classList.remove('running');
-    label.textContent = mode === 'work' ? 'ready to focus' : 'time to recharge';
-    display.classList.toggle('break-mode', mode !== 'work');
-
-    document.querySelectorAll('.tab').forEach(t => {
-      t.classList.toggle('active', t.dataset.mode === mode);
-    });
+function toggle() {
+  if (running) {
+    clearInterval(interval);
+    document.getElementById('startBtn').textContent = 'Start';
+    document.getElementById('startBtn').classList.remove('active');
+  } else {
+    interval = setInterval(() => {
+      seconds--;
+      if (seconds < 0) {
+        clearInterval(interval);
+        running = false;
+        if (mode === 'focus') { count++; mode = 'break'; seconds = BREAK; }
+        else { mode = 'focus'; seconds = FOCUS; }
+        document.getElementById('startBtn').textContent = 'Start';
+        document.getElementById('startBtn').classList.remove('active');
+      }
+      render();
+    }, 1000);
+    document.getElementById('startBtn').textContent = 'Pause';
+    document.getElementById('startBtn').classList.add('active');
   }
+  running = !running;
+}
 
-  function render() {
-    const m = Math.floor(remaining / 60);
-    const s = remaining % 60;
-    display.innerHTML = String(m).padStart(2,'0') +
-      '<span class="colon">:</span>' + String(s).padStart(2,'0');
-    if (currentMode !== 'work') display.classList.add('break-mode');
-  }
+function reset() {
+  clearInterval(interval);
+  running = false;
+  mode = 'focus';
+  seconds = FOCUS;
+  document.getElementById('startBtn').textContent = 'Start';
+  document.getElementById('startBtn').classList.remove('active');
+  render();
+}
 
-  function renderCycles() {
-    cyclesEl.innerHTML = '';
-    for (let i = 0; i < 4; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'dot' + (i < completed ? ' done' : '');
-      cyclesEl.appendChild(dot);
-    }
-  }
-
-  startBtn.addEventListener('click', () => {
-    if (running) {
-      clearInterval(interval); interval = null; running = false;
-      startBtn.textContent = 'Resume';
-      startBtn.classList.remove('running');
-      label.textContent = 'paused';
-    } else {
-      running = true;
-      startBtn.textContent = 'Pause';
-      startBtn.classList.add('running');
-      label.textContent = currentMode === 'work' ? 'deep work' : 'resting';
-      interval = setInterval(() => {
-        remaining--;
-        if (remaining <= 0) {
-          clearInterval(interval); interval = null; running = false;
-          if (currentMode === 'work') {
-            completed = Math.min(completed + 1, 4);
-            renderCycles();
-            label.textContent = 'session done ⚡';
-          } else {
-            label.textContent = 'break over — back to it';
-          }
-          startBtn.textContent = 'Start';
-          startBtn.classList.remove('running');
-          remaining = 0;
-        }
-        render();
-      }, 1000);
-    }
-  });
-
-  resetBtn.addEventListener('click', () => {
-    const tab = document.querySelector('.tab.active');
-    setMode(parseInt(tab.dataset.mins), tab.dataset.mode);
-  });
-
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      setMode(parseInt(tab.dataset.mins), tab.dataset.mode);
-    });
-  });
-
-  setMode(25, 'work');
-  renderCycles();
+render();
 </script>
 </body>
 </html>

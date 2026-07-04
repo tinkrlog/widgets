@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="theme.css">
+<style>
+  body { display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+  .wrap { text-align: center; }
+  .label-top { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 4px; }
+  .project { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+  .grid { display: flex; gap: 20px; justify-content: center; margin-bottom: 16px; }
+  .unit { text-align: center; }
+  .unit .num { font-size: 40px; font-weight: 700; letter-spacing: -2px; color: var(--text); }
+  .unit .lbl { font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-ghost); margin-top: 2px; }
+  .note { font-size: 9px; color: var(--text-ghost); }
+  .setup { padding: 20px; text-align: center; }
+  .setup input {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 6px 4px;
+    width: 180px;
+  }
+  .setup .btn {
+    background: var(--amber);
+    border: none;
+    color: #0d0d0d;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="countdown" style="display:none">
+  <div class="label-top">🚀 launching</div>
+  <div class="project" id="proj"></div>
+  <div class="grid">
+    <div class="unit"><div class="num" id="dd">00</div><div class="lbl">days</div></div>
+    <div class="unit"><div class="num" id="hh">00</div><div class="lbl">hours</div></div>
+    <div class="unit"><div class="num" id="mm">00</div><div class="lbl">mins</div></div>
+  </div>
+  <div class="note">
+    <span id="dateLabel"></span> · <a href="#" onclick="localStorage.removeItem('tinkrlog-countdown');location.reload()" style="color:var(--text-ghost)">reset</a>
+  </div>
+</div>
+<div class="setup" id="setup">
+  <div class="label-top" style="margin-bottom:12px">🚀 set launch date</div>
+  <div><input type="text" id="nameIn" placeholder="Project name"></div>
+  <div><input type="date" id="dateIn"></div>
+  <div><button class="btn" onclick="save()">Start countdown</button></div>
+</div>
+<script>
+function save() {
+  const name = document.getElementById('nameIn').value;
+  const date = document.getElementById('dateIn').value;
+  if (!name || !date) return;
+  localStorage.setItem('tinkrlog-countdown', JSON.stringify({name, date}));
+  location.reload();
+}
+
+function tick() {
+  const data = JSON.parse(localStorage.getItem('tinkrlog-countdown'));
+  if (!data) { document.getElementById('setup').style.display = ''; return; }
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('countdown').style.display = '';
+  document.getElementById('proj').textContent = data.name;
+  document.getElementById('dateLabel').textContent = data.date;
+
+  const diff = new Date(data.date) - new Date();
+  if (diff <= 0) { document.getElementById('dd').textContent = '🚀'; document.getElementById('hh').textContent = ''; document.getElementById('mm').textContent = ''; return; }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  document.getElementById('dd').textContent = String(d).padStart(2,'0');
+  document.getElementById('hh').textContent = String(h).padStart(2,'0');
+  document.getElementById('mm').textContent = String(m).padStart(2,'0');
+}
+
+tick();
+setInterval(tick, 60000);
+</script>
+</body>
+</html>

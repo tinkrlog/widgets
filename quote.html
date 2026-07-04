@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="theme.css">
+<style>
+  body { display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; padding: 0 24px; }
+  .wrap { display: flex; gap: 16px; align-items: center; max-width: 600px; }
+  .bolt { font-size: 20px; flex-shrink: 0; }
+  .text { font-size: 13px; font-style: italic; color: var(--text-dim); line-height: 1.6; }
+  .author { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-ghost); margin-top: 6px; }
+  .author .dash { color: var(--amber); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="bolt">⚡</span>
+  <div>
+    <div class="text" id="quote"></div>
+    <div class="author"><span class="dash">—</span> <span id="author"></span></div>
+  </div>
+</div>
+<script>
+const quotes = [
+  ["Ship it before it's ready. You'll learn more from users than from your IDE.", "Pieter Levels"],
+  ["The best time to ship was yesterday. The second best time is today.", "DHH"],
+  ["If you're not embarrassed by the first version, you've launched too late.", "Reid Hoffman"],
+  ["Make something people want.", "Paul Graham"],
+  ["Ideas are cheap. Execution is everything.", "Chris Sacca"],
+  ["Done is better than perfect.", "Sheryl Sandberg"],
+  ["The only way to win is to learn faster than anyone else.", "Eric Ries"],
+  ["Stay small, stay focused, stay profitable.", "Jason Fried"],
+  ["Build something 100 people love, not something 1 million people kind of like.", "Paul Graham"],
+  ["Your side project only dies if you stop showing up.", "tinkrlog"]
+];
+const i = Math.floor((Date.now() / 86400000)) % quotes.length;
+document.getElementById('quote').textContent = quotes[i][0];
+document.getElementById('author').textContent = quotes[i][1];
+</script>
+</body>
+</html>

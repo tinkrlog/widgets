@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="theme.css">
+<style>
+  body { display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+  .wrap { text-align: center; }
+  .label-top { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 8px; }
+  svg { display: block; margin: 0 auto; }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 6; }
+  .ring-fill { fill: none; stroke: var(--amber); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+
+  @media (prefers-color-scheme: dark) {
+    .ring-bg { stroke: rgba(255,255,255,0.07); }
+  }
+
+  .center-text { font-size: 28px; font-weight: 700; letter-spacing: -1px; fill: var(--text); }
+  .center-sub { font-size: 9px; fill: var(--text-ghost); letter-spacing: 1.5px; }
+  .goal-text { font-size: 10px; color: var(--text-ghost); margin-top: 10px; }
+  .goal-text .amt { color: var(--text-dim); font-weight: 600; }
+
+  .setup { padding: 20px; text-align: center; }
+  .setup input {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 6px 4px;
+    width: 140px;
+  }
+  .setup .btn {
+    background: var(--amber);
+    border: none;
+    color: #0d0d0d;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="ring" style="display:none">
+  <div class="label-top">💰 mrr goal</div>
+  <svg width="140" height="140" viewBox="0 0 140 140">
+    <circle class="ring-bg" cx="70" cy="70" r="58"/>
+    <circle class="ring-fill" id="fill" cx="70" cy="70" r="58"
+            stroke-dasharray="364.42" stroke-dashoffset="364.42"
+            transform="rotate(-90 70 70)"/>
+    <text class="center-text" x="70" y="72" text-anchor="middle" id="pctText">0%</text>
+    <text class="center-sub" x="70" y="88" text-anchor="middle" id="curText">€0</text>
+  </svg>
+  <div class="goal-text">goal: <span class="amt" id="goalText">€0</span> · <a href="#" onclick="localStorage.removeItem('tinkrlog-mrr-goal');location.reload()" style="color:var(--text-ghost)">reset</a></div>
+</div>
+<div class="setup" id="setup">
+  <div class="label-top" style="margin-bottom:12px">💰 set mrr goal</div>
+  <div><input type="number" id="goalIn" placeholder="Goal (€)"></div>
+  <div><input type="number" id="curIn" placeholder="Current MRR (€)"></div>
+  <div><button class="btn" onclick="save()">Set goal</button></div>
+</div>
+<script>
+const KEY = 'tinkrlog-mrr-goal';
+const CIRC = 2 * Math.PI * 58; // 364.42
+
+function save() {
+  const goal = parseFloat(document.getElementById('goalIn').value);
+  const current = parseFloat(document.getElementById('curIn').value) || 0;
+  if (!goal || goal <= 0) return;
+  localStorage.setItem(KEY, JSON.stringify({goal, current}));
+  location.reload();
+}
+
+function render() {
+  const raw = localStorage.getItem(KEY);
+  if (!raw) { document.getElementById('setup').style.display = ''; return; }
+  const data = JSON.parse(raw);
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('ring').style.display = '';
+
+  const pct = Math.min(data.current / data.goal, 1);
+  const offset = CIRC * (1 - pct);
+  document.getElementById('fill').style.strokeDashoffset = offset;
+  document.getElementById('pctText').textContent = Math.round(pct * 100) + '%';
+  document.getElementById('curText').textContent = '€' + data.current;
+  document.getElementById('goalText').textContent = '€' + data.goal;
+
+  if (pct >= 1) {
+    document.getElementById('fill').style.stroke = 'var(--green)';
+  }
+}
+render();
+</script>
+</body>
+</html>

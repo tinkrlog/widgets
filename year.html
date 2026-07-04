@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="theme.css">
+<style>
+  body { display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; padding: 0 20px; }
+  .wrap { width: 100%; max-width: 400px; }
+  .header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .pct { font-size: 13px; font-weight: 600; color: var(--amber); }
+  .sub { font-size: 9px; color: var(--text-ghost); letter-spacing: 0.5px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <span class="label" id="year"></span>
+    <span class="pct" id="pct"></span>
+  </div>
+  <div class="sub" id="sub"></div>
+  <div class="bar-track"><div class="bar-fill" id="bar"></div></div>
+</div>
+<script>
+const now = new Date();
+const y = now.getFullYear();
+const start = new Date(y, 0, 1);
+const end = new Date(y + 1, 0, 1);
+const total = Math.ceil((end - start) / 86400000);
+const day = Math.ceil((now - start) / 86400000);
+const pct = (day / total * 100).toFixed(1);
+const left = total - day;
+
+document.getElementById('year').textContent = y;
+document.getElementById('pct').textContent = pct + '%';
+document.getElementById('sub').textContent = `Day ${day} of ${total} · ${left} days left`;
+document.getElementById('bar').style.width = pct + '%';
+</script>
+</body>
+</html>

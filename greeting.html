@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="theme.css">
+<style>
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    overflow: hidden;
+  }
+  .greeting { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 4px; }
+  .time { font-size: 48px; font-weight: 700; letter-spacing: -2px; color: var(--text); }
+  .time .colon { color: var(--amber); }
+  .date { font-size: 10px; color: var(--text-ghost); letter-spacing: 1.5px; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div>
+  <div class="greeting">⚡ <span id="greet"></span></div>
+  <div class="time" id="clock"></div>
+  <div class="date" id="date"></div>
+</div>
+<script>
+function update() {
+  const now = new Date();
+  const h = now.getHours();
+  const m = String(now.getMinutes()).padStart(2, '0');
+
+  const greet = h < 6 ? 'night owl mode' : h < 12 ? 'good morning, builder' : h < 18 ? 'good afternoon, builder' : 'evening session';
+  document.getElementById('greet').textContent = greet;
+  document.getElementById('clock').innerHTML = `${h}<span class="colon">:</span>${m}`;
+
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('date').textContent = `${days[now.getDay()]} · ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+}
+update();
+setInterval(update, 10000);
+</script>
+</body>
+</html>

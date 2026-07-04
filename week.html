@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="theme.css">
+<style>
+  body { display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; padding: 0 20px; }
+  .wrap { width: 100%; max-width: 400px; }
+  .header { display: flex; justify-content: space-between; margin-bottom: 14px; }
+  .pct { font-size: 13px; font-weight: 600; color: var(--amber); }
+  .days { display: flex; gap: 5px; }
+  .d { flex: 1; height: 28px; border-radius: 4px; transition: background 0.3s; }
+  .d.past { background: var(--amber-glow); }
+  .d.today { background: var(--amber); box-shadow: 0 0 12px rgba(245,197,66,0.3); }
+  .d.future { background: var(--card-bg); border: 1px solid var(--border); }
+  .labels { display: flex; gap: 5px; margin-top: 6px; }
+  .labels span { flex: 1; text-align: center; font-size: 8px; letter-spacing: 1px; color: var(--text-ghost); text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <span class="label">⚡ this week</span>
+    <span class="pct" id="pct"></span>
+  </div>
+  <div class="days" id="days"></div>
+  <div class="labels" id="labels"></div>
+</div>
+<script>
+const names = ['M','T','W','T','F','S','S'];
+const now = new Date();
+const dow = (now.getDay() + 6) % 7; // monday=0
+const pct = Math.round(((dow + 1) / 7) * 100);
+document.getElementById('pct').textContent = pct + '%';
+
+const daysEl = document.getElementById('days');
+const labelsEl = document.getElementById('labels');
+for (let i = 0; i < 7; i++) {
+  const d = document.createElement('div');
+  d.className = 'd ' + (i < dow ? 'past' : i === dow ? 'today' : 'future');
+  daysEl.appendChild(d);
+  const l = document.createElement('span');
+  l.textContent = names[i];
+  labelsEl.appendChild(l);
+}
+</script>
+</body>
+</html>

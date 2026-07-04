@@ -1,0 +1,76 @@
+/* tinkrlog — widget theme (v1)
+   Import in every widget: <link rel="stylesheet" href="theme.css">
+   Background is always transparent — Notion colors underneath.
+   Text adapts to system theme (which Notion follows). */
+
+:root {
+  /* brand — invariant */
+  --amber: #f5c542;
+  --amber-deep: #e8a820;
+  --amber-glow: rgba(245, 197, 66, 0.15);
+  --green: #4ade80;
+
+  /* surfaces */
+  --bg: transparent;
+  --card-bg: rgba(0, 0, 0, 0.03);
+  --border: rgba(0, 0, 0, 0.08);
+
+  /* text — light mode defaults */
+  --text: #1a1a1a;
+  --text-dim: #6b6b6b;
+  --text-ghost: #999;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.07);
+    --text: #e8e6e3;
+    --text-dim: #777;
+    --text-ghost: #555;
+  }
+}
+
+/* base reset */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'SFMono-Regular', 'Cascadia Code', 'JetBrains Mono',
+               'Fira Code', Consolas, monospace;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* shared utility classes — optional, use if you want */
+.label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.value-lg {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: var(--text);
+}
+
+.accent { color: var(--amber); }
+.accent-green { color: var(--green); }
+
+.bar-track {
+  height: 6px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber-deep), var(--amber));
+  border-radius: 3px;
+}
